@@ -5,3 +5,7 @@
 [![numpy](https://img.shields.io/badge/numpy-2.0.1-blue)](https://numpy.org/)
 
 Python scripts for constructing input and ski files from STARFORGE datasets. These files are to be read by SKIRT to create simulations of astrophysical processes.
+
+## File Contents
+
+### inputs_SKIRT_carver.py
