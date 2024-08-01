@@ -8,8 +8,8 @@ Python scripts for constructing input and ski files from STARFORGE datasets. The
 
 ## File Contents
 
-### inputs_SKIRT_carver.py
+### SKIRT_input_files.py
 Contains functions to read in an HDF5 file. Outputs the source and gas files that supplement the ski file. 
 
-### backbone_SKIRT_carver.py
+### SKIRT_create_ski.py
 Python wrapper for SKIRT that creates ski file necessary to perform a SKIRT simulation. Requires user input.
