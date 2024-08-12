@@ -1,8 +1,7 @@
 import numpy as np
 import h5py
 import pandas as pd
-
-fname = h5py.File('snapshot_200.hdf5', 'r')
+from globals_SKIRT_carver import getSnapInfo
 
 class SnapshotData:
     def __init__(self, fname):
@@ -13,32 +12,44 @@ class SnapshotData:
     
     def gasFile(self, fname):
         pt0 = fname['PartType0']
-        gas_posx = pt0['Coordinates'][:, 0]
-        gas_posy = pt0['Coordinates'][:, 1]
-        gas_posz = pt0['Coordinates'][:, 2]
-        gas_rho = pt0['Density'][:]
-        gas_edd = pt0['EddingtonTensor'][:, 0]
-        gas_ef = pt0['ElectronAbundance'][:]
-        gas_hii = pt0['HII'][:]
-        gas_inE = pt0['InternalEnergy'][:]
-        gas_Bx = pt0['MagneticField'][:, 0]
-        gas_By = pt0['MagneticField'][:, 1]
-        gas_Bz = pt0['MagneticField'][:, 2]
-        gas_mass = pt0['Masses'][:]
-        gas_metal = pt0['Metallicity'][:, 0]
-        gas_mmf = pt0['MolecularMassFraction'][:]
-        gas_nhf = pt0['NeutralHydrogenAbundance'][:]
-        gas_ids = pt0['ParticleIDs'][:]
-        gas_photE = pt0['PhotonEnergy'][:, 0]
-        gas_pot = pt0['Potential'][:]
-        gas_P = pt0['Pressure'][:]
-        gas_sl = pt0['SmoothingLength'][:]
-        gas_vsnd = pt0['SoundSpeed'][:]
-        gas_sfr = pt0['StarFormationRate'][:]
-        gas_temp = pt0['Temperature'][:]
-        gas_velx = pt0['Velocities'][:, 0]
-        gas_vely = pt0['Velocities'][:, 1]
-        gas_velz = pt0['Velocities'][:, 2]
+        hdr = getSnapInfo(fname)
+        r_extract = hdr['Extraction Radius (pc)']
+        center = hdr['Center (pc)'][0]
+        pt0 = fname['PartType0']
+        gas_x = pt0['Coordinates'][:, 0]
+        gas_y = pt0['Coordinates'][:, 1]
+        gas_z = pt0['Coordinates'][:, 2]
+        transX = gas_x - center
+        transY = gas_y - center
+        transZ = gas_z - center
+        r_dist = np.sqrt(transX**2 + transY**2 + transZ**2)
+        r_cut = r_dist < r_extract
+        gas_posx = transX[r_cut]
+        gas_posy = transY[r_cut]
+        gas_posz = transZ[r_cut]
+        gas_rho = pt0['Density'][:][r_cut]
+        gas_edd = pt0['EddingtonTensor'][:, 0][r_cut]
+        gas_ef = pt0['ElectronAbundance'][:][r_cut]
+        gas_hii = pt0['HII'][:][r_cut]
+        gas_inE = pt0['InternalEnergy'][:][r_cut]
+        gas_Bx = pt0['MagneticField'][:, 0][r_cut]
+        gas_By = pt0['MagneticField'][:, 1][r_cut]
+        gas_Bz = pt0['MagneticField'][:, 2][r_cut]
+        gas_mass = pt0['Masses'][:][r_cut]
+        gas_metal = pt0['Metallicity'][:, 0][r_cut]
+        gas_mmf = pt0['MolecularMassFraction'][:][r_cut]
+        gas_nhf = pt0['NeutralHydrogenAbundance'][:][r_cut]
+        gas_ids = pt0['ParticleIDs'][:][r_cut]
+        gas_photE = pt0['PhotonEnergy'][:, 0][r_cut]
+        gas_pot = pt0['Potential'][:][r_cut]
+        gas_P = pt0['Pressure'][:][r_cut]
+        gas_sl = pt0['SmoothingLength'][:][r_cut]
+        gas_vsnd = pt0['SoundSpeed'][:][r_cut]
+        gas_sfr = pt0['StarFormationRate'][:][r_cut]
+        gas_temp = pt0['Temperature'][:][r_cut]
+        gas_velx = pt0['Velocities'][:, 0][r_cut]
+        gas_vely = pt0['Velocities'][:, 1][r_cut]
+        gas_velz = pt0['Velocities'][:, 2][r_cut]
         gas_table = {'Position X':gas_posx, 'Position Y':gas_posy, 'Position Z':gas_posz, '$V_x$':gas_velx, 
              '$V_y$':gas_vely, '$V_z$':gas_velz, '$B_x$':gas_Bx, '$B_y$':gas_By, '$B_z$':gas_Bz, 'HII':gas_hii,
              'Electron Abundance':gas_ef, 'Molecular Mass Fraction':gas_mmf, 'Neutral Hydrogen Abundance':gas_nhf,
@@ -93,15 +104,17 @@ class SnapshotData:
     def gasSkirt(self, fname):
         gas_skirt = gas_data[['Position X', 'Position Y', 'Position Z', 'Smoothing Length', 'Mass']]
         header = 'Column 1: x-coordinate (pc)\nColumn 2: y-coordinate (pc)\nColumn 3: z-coordinate (pc)\nColumn 4: smoothing length (pc)\nColumn 5: gas mass (g)\n'
-        np.savetxt('snap200_gas.txt', gas_skirt, delimiter=' ', header=header)
+        fullname = fname.filename
+        filename = fullname.replace('.hdf5', '')
+        outfname = filename + '_gas.txt'
+        np.savetxt(outfname, gas_skirt, delimiter=' ', header=header)
         self.gas_skirt.append(gas_skirt)
 
     def sourceSkirt(self, fname):
         src_skirt = src_data[['Position X', 'Position Y', 'Position Z', 'Smoothing Length', 'Total Mass']]
         header = 'Column 1: x-coordinate (kpc)\nColumn 2: y-coordinate (kpc)\nColumn 3: z-coordinate (kpc)\nColumn 4: smoothing length (kpc)\nColumn 5: initial mass (Msun)'
-        np.savetxt('snap200_src.txt', src_skirt, delimiter=' ', header=header)
+        fullname = fname.filename
+        filename = fullname.replace('.hdf5', '')
+        outfname = filename + '_src.txt'
+        np.savetxt(outfname, src_skirt, delimiter=' ', header=header)
         self.source_skirt.append(src_skirt)
-
-snapshot = SnapshotData(fname)
-snapshot.gasFile(fname), snapshot.sourceFile(fname), snapshot.gasSkirt(fname), snapshot.sourceSkirt(fname)
-snapshot.gas_data, snapshot.gas_skirt, snapshot.source_data, snapshot.source_skirt
