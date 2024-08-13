@@ -5,7 +5,8 @@ from writer_SKIRT_carver import SnapshotData
 
 fname = h5py.File('snapshot_200.hdf5', 'r')
 
-readHeader(fname)
+getSnapInfo(fname)
+
 
 snapshot = SnapshotData(fname)
 snapshot.gasFile(fname), snapshot.sourceFile(fname), snapshot.gasSkirt(fname), snapshot.sourceSkirt(fname)

@@ -2,13 +2,12 @@ import numpy as np
 import h5py
 from astropy import units as u
 
-def readHeader(fname):
+def getSnapInfo(fname, r_extract = 0.25):
     simInfo = {}
     
     boxsize = fname['Header'].attrs['BoxSize']
     center = np.full(3, boxsize/2)
     r_cloud = boxsize/10
-    r_extract = r_cloud/4
     snap_time = fname['Header'].attrs['Time']
     gizmo_vs = fname['Header'].attrs['GIZMO_version']
     length_cgs = fname['Header'].attrs['UnitLength_In_CGS']

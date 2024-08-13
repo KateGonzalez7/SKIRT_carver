@@ -1,7 +1,7 @@
 import numpy as np
 import h5py
 import pandas as pd
-from globals_SKIRT_carver import readHeader
+from globals_SKIRT_carver import getSnapInfo
 
 class SnapshotData:
     def __init__(self, fname):
@@ -12,7 +12,7 @@ class SnapshotData:
     
     def gasFile(self, fname):
         pt0 = fname['PartType0']
-        hdr = readHeader(fname)
+        hdr = getSnapInfo(fname)
         r_extract = hdr['Extraction Radius (pc)']
         center = hdr['Center (pc)'][0]
         pt0 = fname['PartType0']
@@ -118,7 +118,3 @@ class SnapshotData:
         outfname = filename + '_src.txt'
         np.savetxt(outfname, src_skirt, delimiter=' ', header=header)
         self.source_skirt.append(src_skirt)
-
-snapshot = SnapshotData(fname)
-snapshot.gasFile(fname), snapshot.sourceFile(fname), snapshot.gasSkirt(fname), snapshot.sourceSkirt(fname)
-snapshot.gas_data, snapshot.gas_skirt, snapshot.source_data, snapshot.source_skirt
