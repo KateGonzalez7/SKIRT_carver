@@ -1,7 +1,14 @@
 import numpy as np
 import h5py
-from globals_SKIRT_carver import readHeader
+from globals_SKIRT_carver import getSnapInfo
 from writer_SKIRT_carver import SnapshotData
+from create_ski_SKIRT_carver import createSki
+
+import pts.utils as ut
+import pts.simulation as sm
+import pts.visual as vs
+import pts.do
+pts.do.initializePTS()
 
 fname = h5py.File('snapshot_200.hdf5', 'r')
 
