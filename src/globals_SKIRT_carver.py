@@ -3,8 +3,10 @@ import h5py
 from astropy import units as u
 
 def getSnapInfo(fname, r_extract = 0.25):
+    # Dictionary to hold simulation information
     simInfo = {}
-    
+
+    # Extract necessary attributes from header
     boxsize = fname['Header'].attrs['BoxSize']
     center = np.full(3, boxsize/2)
     r_cloud = boxsize/10
@@ -14,9 +16,11 @@ def getSnapInfo(fname, r_extract = 0.25):
     mass_cgs = fname['Header'].attrs['UnitMass_In_CGS']
     velocity_cgs = fname['Header'].attrs['UnitVelocity_In_CGS']
 
+    # Convert snapshot time units to years
     time_yr = (u.pc/(u.m/u.s)).to('yr')
     snapshot_time = snap_time * time_yr
 
+    # Add attributes to dictionary
     simInfo['BoxSize (pc)'] = boxsize
     simInfo['Center (pc)'] = center
     simInfo['Cloud Radius (pc)'] = r_cloud
@@ -30,9 +34,10 @@ def getSnapInfo(fname, r_extract = 0.25):
     return simInfo
 
 class UnitConv:
+    # Units convertible to cgs
     cgs_units = ['cm','g','s']
     len_units = ['cm','au','pc']
-    mass_units = ['sol','g']
+    mass_units = ['msun','g']
     time_units = ['s','yr','Myr']
     au2cm = 1.496e13
     pc2cm = 3.08567758128e18
@@ -41,7 +46,7 @@ class UnitConv:
     rsun2cm = 6.9550e10
     yr2s = 3.154e7
     Myr2s = 3.154e13
-
+    
     def Convert(x,unit_in,unit_out,cgsunit):
         if cgsunit not in UnitConv.cgs_units:
             print("Unit conversion failure for cgs unit: " + str(cgsunit))
