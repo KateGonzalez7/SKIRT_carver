@@ -32,6 +32,9 @@ class SnapshotData:
         r_cut = r_dist < r_extract
 
         # Adjust datasets for radial cut
+        gas_posx = transX[r_cut]
+        gas_posy = transY[r_cut]
+        gas_posz = transZ[r_cut]
         gas_rho = pt0['Density'][:][r_cut]
         gas_edd = pt0['EddingtonTensor'][:, 0][r_cut]
         gas_ef = pt0['ElectronAbundance'][:][r_cut]
@@ -40,7 +43,7 @@ class SnapshotData:
         gas_Bx = pt0['MagneticField'][:, 0][r_cut]
         gas_By = pt0['MagneticField'][:, 1][r_cut]
         gas_Bz = pt0['MagneticField'][:, 2][r_cut]
-        gas_m = pt0['Masses'][:][r_cut]
+        gas_mass = pt0['Masses'][:][r_cut]
         gas_metal = pt0['Metallicity'][:, 0][r_cut]
         gas_mmf = pt0['MolecularMassFraction'][:][r_cut]
         gas_nhf = pt0['NeutralHydrogenAbundance'][:][r_cut]
@@ -48,20 +51,13 @@ class SnapshotData:
         gas_photE = pt0['PhotonEnergy'][:, 0][r_cut]
         gas_pot = pt0['Potential'][:][r_cut]
         gas_P = pt0['Pressure'][:][r_cut]
-        gas_s = pt0['SmoothingLength'][:][r_cut]
+        gas_sl = pt0['SmoothingLength'][:][r_cut]
         gas_vsnd = pt0['SoundSpeed'][:][r_cut]
         gas_sfr = pt0['StarFormationRate'][:][r_cut]
         gas_temp = pt0['Temperature'][:][r_cut]
         gas_velx = pt0['Velocities'][:, 0][r_cut]
         gas_vely = pt0['Velocities'][:, 1][r_cut]
         gas_velz = pt0['Velocities'][:, 2][r_cut]
-
-        # Convert units of datasets to cgs
-        gas_posx = UnitConv.Convert(transX[r_cut], 'pc', 'cm', 'cm')
-        gas_posy = UnitConv.Convert(transY[r_cut], 'pc', 'cm', 'cm')
-        gas_posz = UnitConv.Convert(transZ[r_cut], 'pc', 'cm', 'cm')
-        gas_mass = UnitConv.Convert(gas_m, 'msun', 'g', 'g')
-        gas_sl = UnitConv.Convert(gas_s, 'pc', 'cm', 'cm')
 
         # Organize datasets into dataframe
         gas_table = {'Position X':gas_posx, 'Position Y':gas_posy, 'Position Z':gas_posz, '$V_x$':gas_velx, 
@@ -80,9 +76,9 @@ class SnapshotData:
         pt5 = fname['PartType5']
 
         # Put each dataset into an array
-        src_x = pt5['Coordinates'][:, 0]
-        src_y = pt5['Coordinates'][:, 1]
-        src_z = pt5['Coordinates'][:, 2]
+        src_posx = pt5['Coordinates'][:, 0]
+        src_posy = pt5['Coordinates'][:, 1]
+        src_posz = pt5['Coordinates'][:, 2]
         src_velx = pt5['Velocities'][:, 0]
         src_vely = pt5['Velocities'][:, 1]
         src_velz = pt5['Velocities'][:, 2]
@@ -91,11 +87,11 @@ class SnapshotData:
         src_momz = pt5['BH_Specific_AngMom'][:, 2]
         src_mstar = pt5['BH_Mass'][:]
         src_mdisk = pt5['BH_Mass_AlphaDisk'][:]
-        src_m = pt5['Masses'][:]
+        src_mass = pt5['Masses'][:]
         src_massd = pt5['Mass_D'][:]
         src_mdot = pt5['BH_Mdot'][:]
         src_mzams = pt5['ZAMS_Mass'][:]
-        src_s = pt5['BH_AccretionLength'][:]
+        src_sl = pt5['BH_AccretionLength'][:]
         src_ids = pt5['ParticleIDs'][:]
         src_metal = pt5['Metallicity'][:, 0]
         src_pot = pt5['Potential'][:]
@@ -106,12 +102,9 @@ class SnapshotData:
         src_lum = pt5['StarLuminosity_Solar'][:]
         src_sinkr = pt5['SinkRadius'][:]
 
-        # Convert units of datasets to cgs
-        src_posx = UnitConv.Convert(src_x, 'pc', 'cm', 'cm')
-        src_posy = UnitConv.Convert(src_y, 'pc', 'cm', 'cm')
-        src_posz = UnitConv.Convert(src_z, 'pc', 'cm', 'cm')
-        src_mass = UnitConv.Convert(src_m, 'msun', 'g', 'g')
-        src_sl = UnitConv.Convert(src_s, 'pc', 'cm', 'cm')
+        # Determine the temperature of the source
+        sigma = 5.670374419e-5
+        src_temp = (src_lum / (4 * np.pi * src_radius**2 * sigma))**0.25
 
         # Organize datasets into dataframe
         src_table = {'Position X':src_posx, 'Position Y':src_posy, 'Position Z':src_posz, '$V_x$':src_velx, 
@@ -120,7 +113,7 @@ class SnapshotData:
              'Mass Acc. Rate':src_mdot, 'ZAMS Mass':src_mzams, 'Smoothing Length':src_sl, 'Metallicity':src_metal,
              'Potential':src_pot, 'Protostar Age':src_age, 'Protostar Radius [$R_\odot$]':src_radius,
              'Protostar Stage':src_stage, 'Stellar Formation Time':src_sft, 'Luminosity [$L_\odot$]':src_lum,
-             'Sink Radius':src_sinkr}
+             'Sink Radius':src_sinkr, 'Temperature':src_temp}
         global src_data 
         src_data = pd.DataFrame(data=src_table)
         src_data.set_index(src_ids, inplace=True)
@@ -128,10 +121,10 @@ class SnapshotData:
 
     def gasSkirt(self, fname):
         # Create subset of data to be read into SKIRT
-        gas_skirt = gas_data[['Position X', 'Position Y', 'Position Z', 'Smoothing Length', 'Mass']]
+        gas_skirt = gas_data[['Position X', 'Position Y', 'Position Z', 'Smoothing Length', 'Mass']] 
 
         # Header in format readable by SKIRT
-        header = 'Column 1: x-coordinate (cm)\nColumn 2: y-coordinate (cm)\nColumn 3: z-coordinate (cm)\nColumn 4: smoothing length (cm)\nColumn 5: gas mass (g)\n'
+        header = 'Column 1: x-coordinate (pc)\nColumn 2: y-coordinate (pc)\nColumn 3: z-coordinate (pc)\nColumn 4: smoothing length (pc)\nColumn 5: gas mass (Msun)\n'
 
         # Write subset of data to file
         fullname = fname.filename
@@ -144,10 +137,10 @@ class SnapshotData:
 
     def sourceSkirt(self, fname):
         # Create subset of data to be read into SKIRT
-        src_skirt = src_data[['Position X', 'Position Y', 'Position Z', 'Smoothing Length', 'Total Mass']]
+        src_skirt = src_data[['Position X', 'Position Y', 'Position Z', 'Protostar Radius [$R_\odot$]', 'Total Mass', 'Smoothing Length', 'Temperature']]
 
         # Header in format readable by SKIRT
-        header = 'Column 1: x-coordinate (cm)\nColumn 2: y-coordinate (cm)\nColumn 3: z-coordinate (cm)\nColumn 4: smoothing length (cm)\nColumn 5: initial mass (g)'
+        header = 'Column 1: x-coordinate (pc)\nColumn 2: y-coordinate (pc)\nColumn 3: z-coordinate (pc)\nColumn 4: smoothing length (pc)\nColumn 5: initial mass (Msun)\nColumn 6: source radius (pc)\nColumn 7: temperature (K)'
 
         # Write subset of data to file
         fullname = fname.filename

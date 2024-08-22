@@ -36,16 +36,17 @@ def getSnapInfo(fname, r_extract = 0.25):
 class UnitConv:
     # Units convertible to cgs
     cgs_units = ['cm','g','s']
-    len_units = ['cm','au','pc']
+    len_units = ['rsun','cm','cmsq','msq','m','au','pc']
     mass_units = ['msun','g']
     time_units = ['s','yr','Myr']
+    m2cm = 100
     au2cm = 1.496e13
     pc2cm = 3.08567758128e18
     msun2g = 1.989e33
     lsun2cgs = 3.83e33
     rsun2cm = 6.9550e10
     yr2s = 3.154e7
-    Myr2s = 3.154e13
+    myr2s = 3.154e13
     
     def Convert(x,unit_in,unit_out,cgsunit):
         if cgsunit not in UnitConv.cgs_units:

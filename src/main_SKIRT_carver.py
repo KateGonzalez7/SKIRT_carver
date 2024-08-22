@@ -4,11 +4,11 @@ from globals_SKIRT_carver import getSnapInfo
 from writer_SKIRT_carver import SnapshotData
 from create_ski_SKIRT_carver import createSki
 
-import pts.utils as ut
-import pts.simulation as sm
-import pts.visual as vs
-import pts.do
-pts.do.initializePTS()
+import PTS9.utils as ut
+import PTS9.simulation as sm
+import PTS9.visual as vs
+import PTS9.do
+PTS9.do.initializePTS()
 
 fname = h5py.File('snapshot_200.hdf5', 'r')
 

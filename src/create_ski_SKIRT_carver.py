@@ -18,6 +18,9 @@ def createSki(fname, gasFile, srcFile):
     instrDistance = 100
     FoV = r_extract
 
+    pSourceTemp = 'ParticleSource filename="snapshot_200_src.txt" importVelocity="false" importVelocityDispersion="false" useColumns="" sourceWeight="1" wavelengthBias="0.5"'
+    pSource = 'ParticleSource filename="snapshot_200_src.txt" importVelocity="false" importVelocityDispersion="false" importCurrentMass="true" useColumns="" sourceWeight="1" wavelengthBias="0.5"'
+
     # Variables to change selection of medium
     sph = f'ParticleMedium filename="{gasFile}" massType="Mass" massFraction="0.2" importMetallicity="false" importTemperature="false" maxTemperature="0 K" importVelocity="false" importMagneticField="false" importVariableMixParams="false" useColumns=""'
     vor = 'VoronoiMeshMedium filename="snapshot_200_gas.txt" minX="-xmax pc" maxX="xmax pc" minY="-ymax pc" maxY="ymax pc" minZ="-zmax pc" maxZ="zmax pc" massType="MassDensity" massFraction="0.2" importMetallicity="true" importTemperature="false" maxTemperature="0 K" importVelocity="false" importMagneticField="false" importVariableMixParams="false" useColumns=""'
@@ -51,6 +54,7 @@ def createSki(fname, gasFile, srcFile):
     filedata = filedata.replace('minZ="-zmax pc"', 'minZ="-' + str(center[0]) + ' pc"')
     filedata = filedata.replace('maxZ="zmax pc"', 'maxZ="' + str(center[0]) + ' pc"')
     filedata = filedata.replace('VoronoiMeshMedium', 'ParticleMedium')
+    filedata = filedata.replace(pSourceTemp, pSource)
 
     with open(filename + '.ski', 'w') as f:
         f.write(filedata)
