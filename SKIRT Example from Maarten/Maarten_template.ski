@@ -1,0 +1,146 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- A SKIRT parameter file © Astronomical Observatory, Ghent University -->
+<skirt-simulation-hierarchy type="MonteCarloSimulation" format="9" producer="Python toolkit for SKIRT (SkiFile class)" time="2024-07-10T20:01:17">
+  <MonteCarloSimulation userLevel="Expert" simulationMode="ExtinctionOnly" iteratePrimaryEmission="false" iterateSecondaryEmission="false" numPackets="1e7">
+    <random type="Random">
+      <Random seed="0"/>
+    </random>
+    <units type="Units">
+      <ExtragalacticUnits wavelengthOutputStyle="Wavelength" fluxOutputStyle="Frequency"/>
+    </units>
+    <cosmology type="Cosmology">
+      <LocalUniverseCosmology/>
+    </cosmology>
+    <sourceSystem type="SourceSystem">
+      <SourceSystem minWavelength="0.1 micron" maxWavelength="5 micron" wavelengths="1 micron" sourceBias="0.5">
+        <sources type="Source">
+          <ParticleSource filename="stars.txt" importVelocity="false" importVelocityDispersion="false" useColumns="" sourceWeight="1" wavelengthBias="0.5">
+            <smoothingKernel type="SmoothingKernel">
+              <CubicSplineSmoothingKernel/>
+            </smoothingKernel>
+            <sedFamily type="SEDFamily">
+              <BruzualCharlotSEDFamily imf="Chabrier" resolution="Low"/>
+            </sedFamily>
+            <wavelengthBiasDistribution type="WavelengthDistribution">
+              <LogWavelengthDistribution minWavelength="0.1 micron" maxWavelength="5 micron"/>
+            </wavelengthBiasDistribution>
+          </ParticleSource>
+          <ParticleSource filename="sfrs.txt" importVelocity="false" importVelocityDispersion="false" useColumns="" sourceWeight="1" wavelengthBias="0.5">
+            <smoothingKernel type="SmoothingKernel">
+              <CubicSplineSmoothingKernel/>
+            </smoothingKernel>
+            <sedFamily type="SEDFamily">
+              <MappingsSEDFamily/>
+            </sedFamily>
+            <wavelengthBiasDistribution type="WavelengthDistribution">
+              <LogWavelengthDistribution minWavelength="0.1 micron" maxWavelength="5 micron"/>
+            </wavelengthBiasDistribution>
+          </ParticleSource>
+        </sources>
+      </SourceSystem>
+    </sourceSystem>
+    <mediumSystem type="MediumSystem">
+      <MediumSystem>
+        <photonPacketOptions type="PhotonPacketOptions">
+          <PhotonPacketOptions forceScattering="true" minWeightReduction="1e4" minScattEvents="0" pathLengthBias="0.5"/>
+        </photonPacketOptions>
+        <radiationFieldOptions type="RadiationFieldOptions">
+          <RadiationFieldOptions storeRadiationField="false"/>
+        </radiationFieldOptions>
+        <media type="Medium">
+          <VoronoiMeshMedium filename="gas.txt" minX="-xmax pc" maxX="xmax pc" minY="-ymax pc" maxY="ymax pc" minZ="-zmax pc" maxZ="zmax pc" massType="MassDensity" massFraction="0.2" importMetallicity="true" importTemperature="false" maxTemperature="0 K" importVelocity="false" importMagneticField="false" importVariableMixParams="false" useColumns="">
+            <materialMix type="MaterialMix">
+              <ThemisDustMix numSilicateSizes="15" numHydrocarbonSizes="15"/>
+            </materialMix>
+          </VoronoiMeshMedium>
+        </media>
+        <samplingOptions type="SamplingOptions">
+          <SamplingOptions numDensitySamples="50" numPropertySamples="1" aggregateVelocity="Average"/>
+        </samplingOptions>
+        <grid type="SpatialGrid">
+          <PolicyTreeSpatialGrid minX="-xmax pc" maxX="xmax pc" minY="-ymax pc" maxY="ymax pc" minZ="-zmax pc" maxZ="zmax pc" treeType="OctTree">
+            <policy type="TreePolicy">
+              <DensityTreePolicy minLevel="6" maxLevel="12" maxDustFraction="2e-6" maxDustOpticalDepth="0" wavelength="0.55 micron" maxDustDensityDispersion="0" maxElectronFraction="1e-6" maxGasFraction="1e-6"/>
+            </policy>
+          </PolicyTreeSpatialGrid>
+        </grid>
+      </MediumSystem>
+    </mediumSystem>
+    <instrumentSystem type="InstrumentSystem">
+      <InstrumentSystem>
+        <defaultWavelengthGrid type="WavelengthGrid">
+          <ConfigurableBandWavelengthGrid>
+            <bands type="Band">
+              <BroadBand bandName="GALEX FUV"/>
+              <BroadBand bandName="GALEX NUV"/>
+              <BroadBand bandName="Johnson U"/>
+              <BroadBand bandName="Johnson B"/>
+              <BroadBand bandName="Johnson V"/>
+              <BroadBand bandName="Johnson R"/>
+              <BroadBand bandName="Johnson I"/>
+              <BroadBand bandName="LSST u"/>
+              <BroadBand bandName="LSST g"/>
+              <BroadBand bandName="LSST r"/>
+              <BroadBand bandName="LSST i"/>
+              <BroadBand bandName="LSST z"/>
+              <BroadBand bandName="LSST y"/>
+              <BroadBand bandName="Euclid VIS"/>
+              <BroadBand bandName="Euclid Y"/>
+              <BroadBand bandName="Euclid J"/>
+              <BroadBand bandName="Euclid H"/>
+              <BroadBand bandName="2MASS J"/>
+              <BroadBand bandName="2MASS H"/>
+              <BroadBand bandName="2MASS Ks"/>
+              <BroadBand bandName="WISE W1"/>
+              <BroadBand bandName="WISE W2"/>
+            </bands>
+          </ConfigurableBandWavelengthGrid>
+        </defaultWavelengthGrid>
+        <instruments type="Instrument">
+          <FrameInstrument instrumentName="O1" distance="206.26480625 Mpc" inclination="60.2794585563489460 deg" azimuth="99.80043534876944051 deg" roll="0 deg" fieldOfViewX="160 kpc" numPixelsX="800" centerX="0 pc" fieldOfViewY="160 kpc" numPixelsY="800" centerY="0 pc" recordComponents="false" numScatteringLevels="0" recordPolarization="false" recordStatistics="false">
+                    </FrameInstrument>
+          <FrameInstrument instrumentName="O2" distance="206.26480625 Mpc" inclination="98.99707646880154190 deg" azimuth="-19.70600943535024776 deg" roll="0 deg" fieldOfViewX="160 kpc" numPixelsX="800" centerX="0 pc" fieldOfViewY="160 kpc" numPixelsY="800" centerY="0 pc" recordComponents="false" numScatteringLevels="0" recordPolarization="false" recordStatistics="false">
+                    </FrameInstrument>
+          <FrameInstrument instrumentName="O3" distance="206.26480625 Mpc" inclination="109.83946970455664668 deg" azimuth="-146.23979585759528736 deg" roll="0 deg" fieldOfViewX="160 kpc" numPixelsX="800" centerX="0 pc" fieldOfViewY="160 kpc" numPixelsY="800" centerY="0 pc" recordComponents="false" numScatteringLevels="0" recordPolarization="false" recordStatistics="false">
+                    </FrameInstrument>
+          <FrameInstrument instrumentName="O4" distance="206.26480625 Mpc" inclination="30.4577942544262863 deg" azimuth="-94.08648805981364100 deg" roll="0 deg" fieldOfViewX="160 kpc" numPixelsX="800" centerX="0 pc" fieldOfViewY="160 kpc" numPixelsY="800" centerY="0 pc" recordComponents="false" numScatteringLevels="0" recordPolarization="false" recordStatistics="false">
+                    </FrameInstrument>
+          <FrameInstrument instrumentName="O5" distance="206.26480625 Mpc" inclination="149.5422057932751510 deg" azimuth="85.91351192020692610 deg" roll="0 deg" fieldOfViewX="160 kpc" numPixelsX="800" centerX="0 pc" fieldOfViewY="160 kpc" numPixelsY="800" centerY="0 pc" recordComponents="false" numScatteringLevels="0" recordPolarization="false" recordStatistics="false">
+                    </FrameInstrument>
+        </instruments>
+      </InstrumentSystem>
+    </instrumentSystem>
+    <probeSystem type="ProbeSystem">
+      <ProbeSystem>
+        <probes type="Probe">
+          <ConvergenceInfoProbe probeName="cnv" wavelength="0.55 micron" probeAfter="Setup"/>
+          <DensityProbe probeName="O1" probeAfter="Setup">
+            <form type="Form">
+              <ParallelProjectionForm inclination="60.2794585563489460 deg" azimuth="99.80043534876944051 deg" roll="0 deg" fieldOfViewX="160 kpc" numPixelsX="800" centerX="0 pc" fieldOfViewY="160 kpc" numPixelsY="800" centerY="0 pc"/>
+            </form>
+          </DensityProbe>
+          <DensityProbe probeName="O2" probeAfter="Setup">
+            <form type="Form">
+              <ParallelProjectionForm inclination="98.99707646880154190 deg" azimuth="-19.70600943535024776 deg" roll="0 deg" fieldOfViewX="160 kpc" numPixelsX="800" centerX="0 pc" fieldOfViewY="160 kpc" numPixelsY="800" centerY="0 pc"/>
+            </form>
+          </DensityProbe>
+          <DensityProbe probeName="O3" probeAfter="Setup">
+            <form type="Form">
+              <ParallelProjectionForm inclination="109.83946970455664668 deg" azimuth="-146.23979585759528736 deg" roll="0 deg" fieldOfViewX="160 kpc" numPixelsX="800" centerX="0 pc" fieldOfViewY="160 kpc" numPixelsY="800" centerY="0 pc"/>
+            </form>
+          </DensityProbe>
+          <DensityProbe probeName="O4" probeAfter="Setup">
+            <form type="Form">
+              <ParallelProjectionForm inclination="30.4577942544262863 deg" azimuth="-94.08648805981364100 deg" roll="0 deg" fieldOfViewX="160 kpc" numPixelsX="800" centerX="0 pc" fieldOfViewY="160 kpc" numPixelsY="800" centerY="0 pc"/>
+            </form>
+          </DensityProbe>
+          <DensityProbe probeName="O5" probeAfter="Setup">
+            <form type="Form">
+              <ParallelProjectionForm inclination="149.5422057932751510 deg" azimuth="85.91351192020692610 deg" roll="0 deg" fieldOfViewX="160 kpc" numPixelsX="800" centerX="0 pc" fieldOfViewY="160 kpc" numPixelsY="800" centerY="0 pc"/>
+            </form>
+          </DensityProbe>
+        </probes>
+      </ProbeSystem>
+    </probeSystem>
+  </MonteCarloSimulation>
+</skirt-simulation-hierarchy>
